@@ -42,12 +42,18 @@ import org.w3c.dom.Text;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import java.util.Date;
 import java.util.Map;
+
 
 public class MainActivity extends Activity{
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+
+    private static final int ATTEMPT_TIMEOUT = 30;
+    private final int MAX_TOTAL_ATTEMPTS = 3;
 
     public enum DISPENSER_STATUS {
         IDLE,
@@ -58,6 +64,7 @@ public class MainActivity extends Activity{
         ERROR
     }
 
+
     private static final String RELAY_PIN_NAME = "BCM17"; // GPIO port wired to the RELAY
     private Gpio mRelayGpio;
 
@@ -66,8 +73,7 @@ public class MainActivity extends Activity{
     TTSManager ttsManager;
     GestureDetector gestureDetector;
 
-
-
+    private Long last_attempt;
 
     private DispenserCamera mCamera;
 
@@ -220,6 +226,9 @@ public class MainActivity extends Activity{
         ttsManager = new TTSManager();
         ttsManager.init(this);
         ttsManager.initQueue("Hello world!");
+
+
+
 
 
         DatabaseReference fbReleaseTimer = mDatabase.getReference("release_timer");
@@ -503,10 +512,10 @@ public class MainActivity extends Activity{
             "That's it. Good smile!",
             "I think you deserve candies!"
     };
-    static final String enabled_multiple_times_errors[] = {
-            "OK, because you are trying so hard I think you deserve this time. Don't tell anyone about that.",
-            "Humm, I think that will make you smile. Enjoy these candies and try again later."
-    };
+//    static final String enabled_multiple_times_errors[] = {
+//            "",
+//            "Humm, I think that will make you smile. Enjoy these candies and try again later."
+//    };
     static final String enabled_cat[] = {
             "OK, I will give some candies, but it is for the cat?",
             "This cat is cute. It deserve some candies!"
@@ -593,7 +602,6 @@ public class MainActivity extends Activity{
 
 
 
-
                             // check CV data to confirm if dispenser will be activated
 
                             if (annotations.containsKey("faces") && (int)annotations.get("faces") > 0) {
@@ -613,8 +621,16 @@ public class MainActivity extends Activity{
                                             break;
 
                                         default:
+                                            if (last_attempt == null) {
+                                                last_attempt = System.currentTimeMillis();
+                                            }
+                                            if ((System.currentTimeMillis() - last_attempt) / 1000 > ATTEMPT_TIMEOUT) {
+                                                Log.i(TAG, ">>>> TIMEOUT ATTEMPS!!! <<<< ");
+                                                totalAttempts = 0;
+                                            }
+                                            last_attempt = System.currentTimeMillis();
                                             totalAttempts++;
-                                            if (totalAttempts < 4) {
+                                            if (totalAttempts < MAX_TOTAL_ATTEMPTS) {
                                                 if (total_faces > 1) {
                                                     ttsManager.addQueue(
                                                         String.format(randomMessages(disabled_message_multiple_persons), total_faces), "result"
@@ -630,7 +646,7 @@ public class MainActivity extends Activity{
                                             } else {
                                                 // release after 3 attempts
                                                 ttsManager.addQueue(
-                                                        randomMessages(enabled_multiple_times_errors), "result"
+                                                        randomMessages(enabled_ok), "result"
                                                 );
                                                 log.child("released").setValue(true);
                                                 log.child("multiple_attempts").setValue(true);
