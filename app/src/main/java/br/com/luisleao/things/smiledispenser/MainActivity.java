@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.media.ImageReader;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.PeripheralManagerService;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -90,6 +92,7 @@ public class MainActivity extends Activity{
 
 
     private FirebaseDatabase mDatabase;
+    private DatabaseReference activateRef;
 
 
     /**
@@ -152,17 +155,21 @@ public class MainActivity extends Activity{
                         mBtnTakePicture.setVisibility(View.VISIBLE);
                         mPrgsUploading.setVisibility(View.INVISIBLE);
                         mTVCountdown.setVisibility(View.INVISIBLE);
-                        mIVPreview.setVisibility(View.INVISIBLE);
                         mPrgsChangeScreen.setVisibility(View.INVISIBLE);
-                        mIVPreview.setImageResource(android.R.color.transparent);
                         tvInstructions.setVisibility(View.VISIBLE);
+                        tvInstructions.bringToFront();
 
+                        mIVPreview.setVisibility(View.VISIBLE);
+                        mIVPreview.setImageResource(R.drawable.skittles);
+                        //mIVPreview.setImageResource(android.R.color.transparent);
                         break;
 
                     case COUNTDOWN:
+                        //mIVPreview.setVisibility(View.INVISIBLE);
                         tvInstructions.setVisibility(View.INVISIBLE);
                         mTVCountdown.setVisibility(View.VISIBLE);
                         mBtnTakePicture.setVisibility(View.INVISIBLE);
+                        mTVCountdown.bringToFront();
                         break;
 
                     case TAKING_PICTURE:
@@ -206,6 +213,8 @@ public class MainActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         mDatabase = FirebaseDatabase.getInstance();
 
         ttsManager = new TTSManager();
@@ -240,6 +249,7 @@ public class MainActivity extends Activity{
 
             }
         });
+
 
 
         setContentView(R.layout.activity_main);
@@ -309,15 +319,21 @@ public class MainActivity extends Activity{
             @Override
             public void onClick(View v) {
 
+                Log.i(TAG, "*** CLICKED ***");
                 changeStatus(DISPENSER_STATUS.COUNTDOWN);
                 ttsManager.initQueue("Give me that smile in...");
 
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
                 new CountDownTimer(4000, 1000) {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         String time_left = String.valueOf((int)Math.floor(millisUntilFinished/1000));
-                        ttsManager.addQueue(time_left);
+                        ttsManager.addQueue(time_left, "time_left");
                         mTVCountdown.setText(time_left);
                     }
 
@@ -336,11 +352,39 @@ public class MainActivity extends Activity{
 //                }
 
 
-
-
-
             }
         });
+
+
+
+        activateRef = mDatabase.getReference("activate");
+
+        activateRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                String key = dataSnapshot.getKey();
+
+                //Log.i("onChildAdded", "" + s);
+                Log.i("KEY =======> ", key);
+                releaseDispenser();
+
+                activateRef.child(key).removeValue();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
 
 
 
@@ -562,7 +606,7 @@ public class MainActivity extends Activity{
                                         case "LIKELY":
                                         case "VERY_LIKELY":
                                             ttsManager.addQueue(
-                                                    randomMessages(enabled_ok)
+                                                    randomMessages(enabled_ok), "result"
                                             );
                                             log.child("released").setValue(true);
                                             releaseDispenser();
@@ -573,23 +617,23 @@ public class MainActivity extends Activity{
                                             if (totalAttempts < 4) {
                                                 if (total_faces > 1) {
                                                     ttsManager.addQueue(
-                                                        String.format(randomMessages(disabled_message_multiple_persons), total_faces)
+                                                        String.format(randomMessages(disabled_message_multiple_persons), total_faces), "result"
                                                     );
 
                                                 } else {
 
                                                     ttsManager.addQueue(
-                                                        randomMessages(disabled_message_one_person)
+                                                        randomMessages(disabled_message_one_person), "result"
                                                     );
                                                 }
 
                                             } else {
                                                 // release after 3 attempts
                                                 ttsManager.addQueue(
-                                                        randomMessages(enabled_multiple_times_errors)
+                                                        randomMessages(enabled_multiple_times_errors), "result"
                                                 );
                                                 log.child("released").setValue(true);
-                                                log.child("3_tentatives").setValue(true);
+                                                log.child("multiple_attempts").setValue(true);
                                                 releaseDispenser();
                                             }
                                     }
@@ -597,10 +641,10 @@ public class MainActivity extends Activity{
 
                                 //TODO: add more itens detected, like beard, flags, etc.
                                 if (checkProbability(annotations, "glasses")) {
-                                    ttsManager.addQueue(randomMessages(compliments_glasses));
+                                    ttsManager.addQueue(randomMessages(compliments_glasses), "result");
                                 }
                                 if (checkProbability(annotations, "beard") || checkProbability(annotations, "facialhair")) {
-                                    ttsManager.addQueue(randomMessages(compliments_beard));
+                                    ttsManager.addQueue(randomMessages(compliments_beard), "result");
                                 }
 
 
@@ -609,18 +653,18 @@ public class MainActivity extends Activity{
                                 // no face detected
                                 if (!checkProbability(annotations, "cat")) {
                                     ttsManager.addQueue(
-                                            randomMessages(disabled_message_no_face)
+                                            randomMessages(disabled_message_no_face), "result"
                                     );
                                 }
 
                             }
 
                             if (checkProbability(annotations, "hand")) {
-                                ttsManager.addQueue("Why are you showing your hand?");
+                                ttsManager.addQueue("Why are you showing your hand?", "result");
                             }
 
                             if (checkProbability(annotations, "cat")) {
-                                ttsManager.addQueue(randomMessages(enabled_cat));
+                                ttsManager.addQueue(randomMessages(enabled_cat), "result");
                                 log.child("released").setValue(true);
                                 log.child("cat_presence").setValue(true);
                                 releaseDispenser();
@@ -630,7 +674,7 @@ public class MainActivity extends Activity{
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Cloud Vison API error: ", e);
-                        ttsManager.addQueue("Something went wrong. Can you try again?");
+                        ttsManager.addQueue("Something went wrong. Can you try again?", "result");
                         changeStatus(DISPENSER_STATUS.SHOWING_RESULT);
 
                     }

@@ -19,13 +19,56 @@ public class TTSManager {
     public void init(Context context) {
         try {
             mTts = new TextToSpeech(context, onInitListener);
+//
+//            mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+//                @Override
+//                public void onStart(String utteranceId) {
+//                    // Speaking started.
+//                    Log.i("TTS", "*** TTS ON START: " + utteranceId);
+//                }
+//
+//                @Override
+//                public void onDone(String utteranceId) {
+//                    // Speaking stopped.
+//                    Log.i("TTS", "*** TTS COMPLETED: " + utteranceId);
+//
+//                }
+//
+//                @Override
+//                public void onError(String utteranceId) {
+//
+//                }
+//
+//            });
+
+            mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                public void onStart(String utteranceId) {
+                    Log.i("TTS", "progressListener onStart: " + utteranceId);
+                }
+
+                public void onError(String utteranceId) {
+                    Log.i("TTS", "progressListener onError: " + utteranceId);
+                    //if (utteranceId.equals(ID))
+                    //    done();
+                    return;
+                }
+
+                public void onDone(String utteranceId) {
+                    Log.i("TTS", "progressListener onDone: " + utteranceId);
+                    //if (utteranceId.equals(ID))
+                    //    done();
+                    return;
+                }
+            });
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     //TODO: include UtteranceCompleted callback
-
 
 
 
@@ -47,6 +90,10 @@ public class TTSManager {
 
                 isLoaded = true;
 
+
+
+
+
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("error", "This Language is not supported");
                 }
@@ -60,7 +107,12 @@ public class TTSManager {
         mTts.shutdown();
     }
 
+
     public void addQueue(String text) {
+        addQueue(text, null);
+    }
+
+    public void addQueue(String text, String utteranceId) {
         if (isLoaded)
             mTts.speak(text, TextToSpeech.QUEUE_ADD, null);
         else
