@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ededed"
+    tools:context="br.com.luisleao.things.smiledispenser.MainActivity">
+
+
+    <TextView
+        android:id="@+id/tvCurrentStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CURRENT STATUS"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+
+    <ProgressBar
+        android:id="@+id/prgsChangeScreen"
+        style="@android:style/Widget.Material.Light.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:indeterminate="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivPreview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:adjustViewBounds="false"
+        android:cropToPadding="false"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="@+id/prgsChangeScreen"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/mm" />
+
+    <TextView
+        android:id="@+id/tvCountdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="3"
+        android:textSize="250sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/ivPreview"
+        app:layout_constraintLeft_toLeftOf="@+id/ivPreview"
+        app:layout_constraintRight_toRightOf="@+id/ivPreview"
+        app:layout_constraintTop_toTopOf="@+id/ivPreview" />
+
+    <TextView
+        android:id="@+id/tvInstructions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:lines="2"
+        android:maxLines="2"
+        android:text="Want some candies?
+Hit the button and smile!"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivPreview"
+        app:layout_constraintLeft_toLeftOf="@+id/ivPreview"
+        app:layout_constraintRight_toRightOf="@+id/ivPreview" />
+
+    <!--<Button-->
+        <!--android:id="@+id/btnTakePicture2"-->
+        <!--style="@android:style/Widget.Material.Light.Button.Small"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="20dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:elevation="6dp"-->
+        <!--android:text="Take Picture"-->
+        <!--android:textAppearance="@android:style/TextAppearance.Material.Widget.Button.Borderless.Colored"-->
+        <!--android:textSize="50sp"-->
+        <!--app:layout_constraintBottom_toBottomOf="@+id/ivPreview"-->
+        <!--app:layout_constraintLeft_toLeftOf="@+id/ivPreview"-->
+        <!--app:layout_constraintRight_toRightOf="@+id/ivPreview"-->
+        <!--app:layout_constraintTop_toTopOf="@+id/ivPreview" />-->
+
+
+    <Button
+        android:id="@+id/btnTakePicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
+        android:padding="10dp"
+        android:text="Take a picture!"
+        android:textColor="#ffffff"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivPreview"
+        app:layout_constraintLeft_toLeftOf="@+id/ivPreview"
+        app:layout_constraintRight_toRightOf="@+id/ivPreview"
+        app:layout_constraintTop_toTopOf="@+id/ivPreview" />
+
+    <ProgressBar
+        android:id="@+id/prgsUploading"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/ivPreview"
+        app:layout_constraintLeft_toLeftOf="@+id/ivPreview"
+        app:layout_constraintRight_toRightOf="@+id/ivPreview"
+        app:layout_constraintTop_toTopOf="@+id/ivPreview" />
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "242049244913",
+    "firebase_url": "https://smiledispenser-166922.firebaseio.com",
+    "project_id": "smiledispenser-166922",
+    "storage_bucket": "smiledispenser-166922.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242049244913:android:11414c51d25bb57a",
+        "android_client_info": {
+          "package_name": "br.com.luisleao.things.smiledispenser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "242049244913-np1c8ms920158cqmohmefhto7r8dcr1t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.luisleao.things.smiledispenser",
+            "certificate_hash": "fcfb1f1534814096ff7d68712204065f534a73f9"
+          }
+        },
+        {
+          "client_id": "242049244913-oaooudrf7h7u3c9lm3r170kmd06tmha0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArbFaNxdoquQtrRnY9nO5P34ozatOXHqc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242049244913-oaooudrf7h7u3c9lm3r170kmd06tmha0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
