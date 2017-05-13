@@ -55,6 +55,69 @@ public class MainActivity extends Activity{
     private static final int ATTEMPT_TIMEOUT = 30;
     private final int MAX_TOTAL_ATTEMPTS = 3;
 
+    static final String countdown_messages[] = {
+            "Give me that smile in...",
+            "Smile in...",
+            "",
+            ""
+    };
+
+    static final String messages[] = {
+            "Hold on... I am checking if you are not a robot.",
+            "Just a sec. Let me see what I can tell about you...",
+            "Just a second... I am checking your photo!"
+    };
+
+    static final String disabled_message_multiple_persons[] = {
+            "Looks like you are not alone. Everyone should smile!",
+            "You all need to smile, or no one will get candies!",
+            "I see %d people here, but someone is not smiling to me."
+    };
+
+    static final String disabled_message_one_person[] = {
+            "OK, let's try one more time",
+            "I can't see you smiling. Let's try again!",
+            "No smile... ... no candies! You can try again."
+    };
+
+    static final String enabled_ok[] = {
+            "That's it. Good smile!",
+            "I think you deserve candies!"
+    };
+
+//    static final String enabled_multiple_times_errors[] = {
+//            "",
+//            "Humm, I think that will make you smile. Enjoy these candies and try again later."
+//    };
+
+    static final String enabled_cat[] = {
+            "OK, I will give some candies, but it is for the cat?",
+            "This cat is cute. It deserve some candies!"
+    };
+
+
+    static final String disabled_message_no_face[] = {
+            "I am not seeing any face here.",
+            "Where are you in this picture?",
+            "I can't see your face! Try again."
+    };
+
+    static final String compliments_beard[] = {
+            "and I like your beard!",
+            "and this beard is awesome!"
+    };
+
+    static final String compliments_glasses[] = {
+            "and I like your glasses!",
+            "nice glasses!"
+    };
+
+
+
+
+
+
+
     public enum DISPENSER_STATUS {
         IDLE,
         COUNTDOWN,
@@ -330,7 +393,10 @@ public class MainActivity extends Activity{
 
                 Log.i(TAG, "*** CLICKED ***");
                 changeStatus(DISPENSER_STATUS.COUNTDOWN);
-                ttsManager.initQueue("Give me that smile in...");
+                ttsManager.initQueue(randomMessages(countdown_messages));
+
+
+
 
                 try {
                     Thread.sleep(1000);
@@ -488,55 +554,6 @@ public class MainActivity extends Activity{
 
 
 
-    static final String messages[] = {
-            "Hold on... I am checking if you are not a robot.",
-            "Just a sec. Let me see what I can tell about you...",
-            "Just a second... I am checking your photo!"
-    };
-
-
-
-    static final String disabled_message_multiple_persons[] = {
-            "Looks like you are not alone. Everyone should smile!",
-            "You all need to smile, or no one will get candies!",
-            "I see %d people here, but someone is not smiling to me."
-    };
-
-    static final String disabled_message_one_person[] = {
-            "OK, let's try one more time",
-            "I can't see you smiling. Let's try again!",
-            "No smile... ... no candies! You can try again."
-    };
-
-    static final String enabled_ok[] = {
-            "That's it. Good smile!",
-            "I think you deserve candies!"
-    };
-//    static final String enabled_multiple_times_errors[] = {
-//            "",
-//            "Humm, I think that will make you smile. Enjoy these candies and try again later."
-//    };
-    static final String enabled_cat[] = {
-            "OK, I will give some candies, but it is for the cat?",
-            "This cat is cute. It deserve some candies!"
-    };
-
-
-    static final String disabled_message_no_face[] = {
-            "I can't see any face here... Are you trying to cheat?",
-            "Where are you in this picture?",
-            "I can't see your face! Try again."
-    };
-
-    static final String compliments_beard[] = {
-            "and I like your beard!",
-            "and this beard is awesome!"
-    };
-    static final String compliments_glasses[] = {
-            "and I like your glasses!",
-            "nice glasses!"
-    };
-
 
 
     /**
@@ -614,7 +631,7 @@ public class MainActivity extends Activity{
                                         case "LIKELY":
                                         case "VERY_LIKELY":
                                             ttsManager.addQueue(
-                                                    randomMessages(enabled_ok), "result"
+                                                    randomMessages(enabled_ok)
                                             );
                                             log.child("released").setValue(true);
                                             releaseDispenser();
@@ -633,20 +650,20 @@ public class MainActivity extends Activity{
                                             if (totalAttempts < MAX_TOTAL_ATTEMPTS) {
                                                 if (total_faces > 1) {
                                                     ttsManager.addQueue(
-                                                        String.format(randomMessages(disabled_message_multiple_persons), total_faces), "result"
+                                                        String.format(randomMessages(disabled_message_multiple_persons), total_faces)
                                                     );
 
                                                 } else {
 
                                                     ttsManager.addQueue(
-                                                        randomMessages(disabled_message_one_person), "result"
+                                                        randomMessages(disabled_message_one_person)
                                                     );
                                                 }
 
                                             } else {
                                                 // release after 3 attempts
                                                 ttsManager.addQueue(
-                                                        randomMessages(enabled_ok), "result"
+                                                        randomMessages(enabled_ok)
                                                 );
                                                 log.child("released").setValue(true);
                                                 log.child("multiple_attempts").setValue(true);
@@ -660,7 +677,7 @@ public class MainActivity extends Activity{
                                     ttsManager.addQueue(randomMessages(compliments_glasses), "result");
                                 }
                                 if (checkProbability(annotations, "beard") || checkProbability(annotations, "facialhair")) {
-                                    ttsManager.addQueue(randomMessages(compliments_beard), "result");
+                                    ttsManager.addQueue(randomMessages(compliments_beard));
                                 }
 
 
@@ -669,18 +686,18 @@ public class MainActivity extends Activity{
                                 // no face detected
                                 if (!checkProbability(annotations, "cat")) {
                                     ttsManager.addQueue(
-                                            randomMessages(disabled_message_no_face), "result"
+                                            randomMessages(disabled_message_no_face)
                                     );
                                 }
 
                             }
 
                             if (checkProbability(annotations, "hand")) {
-                                ttsManager.addQueue("Why are you showing your hand?", "result");
+                                ttsManager.addQueue("Why are you showing your hand?");
                             }
 
                             if (checkProbability(annotations, "cat")) {
-                                ttsManager.addQueue(randomMessages(enabled_cat), "result");
+                                ttsManager.addQueue(randomMessages(enabled_cat));
                                 log.child("released").setValue(true);
                                 log.child("cat_presence").setValue(true);
                                 releaseDispenser();
@@ -690,7 +707,7 @@ public class MainActivity extends Activity{
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Cloud Vison API error: ", e);
-                        ttsManager.addQueue("Something went wrong. Can you try again?", "result");
+                        ttsManager.addQueue("Something went wrong. Can you try again?");
                         changeStatus(DISPENSER_STATUS.SHOWING_RESULT);
 
                     }
