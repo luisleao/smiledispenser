@@ -91,9 +91,6 @@ public class TTSManager {
                 isLoaded = true;
 
 
-
-
-
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("error", "This Language is not supported");
                 }

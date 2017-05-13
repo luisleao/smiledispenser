@@ -9,12 +9,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -48,6 +50,8 @@ import java.util.Map;
 
 
 public class MainActivity extends Activity{
+
+    AudioManager audioManager;
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -110,6 +114,11 @@ public class MainActivity extends Activity{
     static final String compliments_glasses[] = {
             "and I like your glasses!",
             "nice glasses!"
+    };
+
+    static final String google_logo[] = {
+            "I saw a Google logo here!",
+            "Are you using a Google shirt?"
     };
 
 
@@ -294,6 +303,7 @@ public class MainActivity extends Activity{
 
 
 
+        // receive relese timer from Firebase
         DatabaseReference fbReleaseTimer = mDatabase.getReference("release_timer");
         fbReleaseTimer.addValueEventListener(new ValueEventListener() {
             @Override
@@ -308,6 +318,7 @@ public class MainActivity extends Activity{
             }
         });
 
+        // receive result timer from Firebase
         DatabaseReference fbResultTimer = mDatabase.getReference("result_timer");
         fbResultTimer.addValueEventListener(new ValueEventListener() {
             @Override
@@ -321,6 +332,29 @@ public class MainActivity extends Activity{
 
             }
         });
+
+
+        // receive volume fomr Firebase
+        audioManager = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        mDatabase.getReference("volume_current").setValue(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+        mDatabase.getReference("volume_max").setValue(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        DatabaseReference fbVolume= mDatabase.getReference("volume_current");
+        fbVolume.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int volume = dataSnapshot.getValue(Integer.class);
+                if (volume != 0)
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+                Log.i(TAG, "VOLUME CHANGED!!! **** " + volume);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
 
 
@@ -546,9 +580,11 @@ public class MainActivity extends Activity{
     private String randomMessages(String[] messages) {
         return messages[(int)Math.floor(messages.length * Math.random())];
     }
-
     private boolean checkProbability(Map<String, Object> annotations, String key) {
-        return annotations.containsKey(key) && (float)annotations.get(key) > 0.5;
+        return checkProbability(annotations, key, 0.5);
+    }
+    private boolean checkProbability(Map<String, Object> annotations, String key, double threshould) {
+        return annotations.containsKey(key) && (float)annotations.get(key) > threshould;
 
     }
 
@@ -692,8 +728,17 @@ public class MainActivity extends Activity{
 
                             }
 
+
+
+
                             if (checkProbability(annotations, "hand")) {
                                 ttsManager.addQueue("Why are you showing your hand?");
+                            }
+                            if (checkProbability(annotations, "google", 0.2) || checkProbability(annotations, "googlelogo", 0.2)) {
+                                ttsManager.addQueue(randomMessages(google_logo), "result");
+                            }
+                            if (checkProbability(annotations, "flagofbrazil", 0.2)) {
+                                ttsManager.addQueue("Brazilians are everywhere! It's awesome to meet you here!", "result");
                             }
 
                             if (checkProbability(annotations, "cat")) {
