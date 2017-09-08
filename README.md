@@ -12,5 +12,9 @@
 * 5V power supply (to use with the machine)
 
 
-
 The machine came with a motor. So I just wired the relay module directly to the motor and use the Pi's GPIO to control it.
+
+
+## Setup the Display:
+
+To make the touch works you need to connect some pins directly to the raspi. You can use [this tutorial](http://www.makeuseof.com/tag/setup-raspberry-pi-touchscreen/) to connect the pins correctly.
