@@ -1,5 +1,9 @@
 # smiledispenser
 
+Se você estiver vendo essa url, este eh um equipamento roubado!
+Entre em contato com talktoleao@gmail.com com informaçoes sobre sua localizaçao.
+
+
 
 ## Equipment
 
